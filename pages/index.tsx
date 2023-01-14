@@ -10,6 +10,7 @@ type Image = {
 	imageSrc: string;
 	name: string;
 	userName: string;
+	updated_at: Date;
 };
 
 const supabaseAdmin = createClient(
