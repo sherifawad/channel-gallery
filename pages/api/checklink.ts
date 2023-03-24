@@ -27,17 +27,17 @@ export default async function handler(
     try {
         const youtubeLink = req.body;
         const response = await fetch(youtubeLink);
-        if (response.status !== 200) throw new Error();
-        await transporter.sendMail({
+        if (response.status !== 200) return res.status(500).send("Error");
+        const result = await transporter.sendMail({
             ...mailOptions,
             subject: "channel gallery comment",
             text: youtubeLink,
             html: `<h1>Channel Gallery new Suggestion</h1><p>${youtubeLink}</p>`,
         });
-        // return res.status(200);
+        return res.status(200).json(result.response);
     } catch (err) {
         // If there was an error, Next.js will continue
         // to show the last successfully generated page
-        // return res.status(500).send("Error");
+        return res.status(500).send("Error");
     }
 }

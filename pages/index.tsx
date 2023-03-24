@@ -3,6 +3,7 @@ import type { NextPage } from "next";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { sendForm } from "./api/checklink";
+import RingLoader from "react-spinners/RingLoader";
 
 type Image = {
     id: number;
@@ -36,28 +37,42 @@ const Gallery: NextPage<{ images: Image[] }> = ({
 }: {
     images: Image[];
 }) => {
+    const [errorMessage, setErrorMessage] = useState("");
+    const [value, setValue] = useState("");
+    const [loading, setLoading] = useState(false);
     const sendEmail = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setLoading(true);
+        setErrorMessage("");
         try {
-            const target = e.target as typeof e.target &
-                HTMLFormElement & {
-                    message: { value: string };
-                };
-            alert("تم");
-            if (
-                !target.message.value
-                    .trim()
-                    .startsWith("https://www.youtube.com") ||
-                target.message.value
-                    .trim()
-                    .startsWith("https://www.youtube.com/watch?v=")
-            ) {
-                target.reset();
+            if (!value.trim().startsWith("https://www.youtube.com")) {
+                setValue("");
+                setErrorMessage("اضف يوتيوب فقط");
+                setLoading(false);
                 return;
             }
-            await sendForm(target.message.value);
-            target.reset();
-        } catch (error) {}
+
+            if (value.trim().startsWith("https://www.youtube.com/watch?v=")) {
+                setValue("");
+                setErrorMessage("اضف لينك القناة و ليس رابط فيديو");
+                setLoading(false);
+                return;
+            }
+            const result = await sendForm(value);
+            if (result.status === 200) {
+                setValue("");
+                setErrorMessage("");
+                setLoading(false);
+                alert("تم");
+                return;
+            }
+            setLoading(false);
+            setErrorMessage("لينك غير صحيح");
+        } catch (error) {
+            setLoading(false);
+        } finally {
+            setLoading(false);
+        }
     };
     return (
         <div className="bg-gray-200">
@@ -89,40 +104,55 @@ const Gallery: NextPage<{ images: Image[] }> = ({
                         <h2 className="px-4 pt-3 pb-2 text-lg text-gray-800">
                             اقترح قناة
                         </h2>
-                        <div className="w-full px-3 mt-2 mb-2 md:w-full">
+                        <div className="w-full px-3 mt-2 mb-2 md:w-full relative">
                             <input
+                                value={value}
+                                onChange={(e) => {
+                                    setValue(e.target.value);
+                                    setErrorMessage("");
+                                }}
                                 className="w-full px-3 py-2 font-medium leading-normal text-left placeholder-gray-700 bg-gray-100 border border-gray-400 rounded resize-none focus:outline-none focus:bg-white"
                                 name="message"
                                 placeholder="رابط القناة"
                                 required
                             ></input>
+                            <div className="absolute block">
+                                <RingLoader color="#36d7b7" loading={loading} />
+                            </div>
                         </div>
-                        <div className="flex items-start w-full px-3 md:w-full">
-                            {/* <div className="flex items-start w-1/2 px-2 mr-auto text-gray-700">
-                                <svg
-                                    fill="none"
-                                    className="w-5 h-5 mr-1 text-gray-600"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                </svg>
-                                <p className="pt-px text-xs md:text-sm">
-                                    Some HTML is okay.
-                                </p>
-                            </div> */}
-                            <div className="-mr-1">
+                        <div className="flex items-center justify-between w-full px-3 ">
+                            <div className="-mr-1 grid">
                                 <input
+                                    disabled={loading}
                                     type="submit"
-                                    className="px-4 py-1 mr-1 font-medium tracking-wide text-gray-700 bg-white border border-gray-400 rounded-lg hover:bg-gray-100"
-                                    value="ارسل اقتراحك"
+                                    className={`px-4 py-1 mr-1 font-medium tracking-wide text-gray-700 bg-white border border-gray-400 rounded-lg ${
+                                        loading ? "" : "hover:bg-gray-100"
+                                    } `}
+                                    value="ارسل ا قتراحك"
                                 />
                             </div>
+                            {errorMessage.length > 2 ? (
+                                <div className="flex items-center px-2 text-gray-700">
+                                    <p className="pt-px text-xs md:text-sm text-red-700">
+                                        {errorMessage}
+                                    </p>
+                                    <svg
+                                        fill="none"
+                                        className="w-5 h-5 mr-1 text-red-700"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                    </svg>
+                                </div>
+                            ) : (
+                                ""
+                            )}
                         </div>
                     </div>
                 </form>
