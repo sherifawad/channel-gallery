@@ -2,7 +2,6 @@ import { createClient } from "@supabase/supabase-js";
 import type { NextPage } from "next";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
-import axios from "axios";
 import { sendForm } from "./api/checklink";
 
 type Image = {
