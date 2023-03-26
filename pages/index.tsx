@@ -104,7 +104,7 @@ const Gallery: NextPage<{ images: Image[] }> = ({
                         <h2 className="px-4 pt-3 pb-2 text-lg text-gray-800">
                             اقترح قناة
                         </h2>
-                        <div className="w-full px-3 mt-2 mb-2 md:w-full relative">
+                        <div className="relative w-full px-3 mt-2 mb-2 md:w-full">
                             <input
                                 value={value}
                                 onChange={(e) => {
@@ -121,7 +121,7 @@ const Gallery: NextPage<{ images: Image[] }> = ({
                             </div>
                         </div>
                         <div className="flex items-center justify-between w-full px-3 ">
-                            <div className="-mr-1 grid">
+                            <div className="grid -mr-1">
                                 <input
                                     disabled={loading}
                                     type="submit"
@@ -133,7 +133,7 @@ const Gallery: NextPage<{ images: Image[] }> = ({
                             </div>
                             {errorMessage.length > 2 ? (
                                 <div className="flex items-center px-2 text-gray-700">
-                                    <p className="pt-px text-xs md:text-sm text-red-700">
+                                    <p className="pt-px text-xs text-red-700 md:text-sm">
                                         {errorMessage}
                                     </p>
                                     <svg
@@ -172,7 +172,7 @@ function BlurImage({
 
     return (
         <a href={image.href} className="group">
-            <div className="w-full overflow-hidden bg-gray-200 rounded-lg aspect-w-1 aspect-h-1 xl:aspect-w-7 xl:aspect-h-8">
+            <div className="w-full overflow-hidden bg-gray-200 rounded-lg aspect-w-1.8 aspect-h-1 xl:aspect-w-11.9 xl:aspect-h-7">
                 <Image
                     priority={priority}
                     alt=""
